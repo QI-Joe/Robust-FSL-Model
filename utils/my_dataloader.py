@@ -441,8 +441,6 @@ class Temporal_Splitting(object):
         edge_attr = self.graph.edge_attr
         pos = self.graph.pos
 
-        reset_idx = kwargs["reset_idx"]
-
         max_time = max(edge_attr)
         temporal_subgraphs = []
 
@@ -476,12 +474,7 @@ class Temporal_Splitting(object):
             subpos = pos[self.n_id.sample_idx(sampled_nodes)]
 
 
-            if reset_idx:
-                fea_pos = pos
-                temporal_subgraph = Temporal_Dataloader(nodes=sampled_nodes, edge_index=sampled_edges, \
-                                                    edge_attr=edge_attr[sample_time], y=y, pos=fea_pos)
-            else:
-                temporal_subgraph = Temporal_Dataloader(nodes=sampled_nodes, edge_index=sampled_edges, \
+            temporal_subgraph = Temporal_Dataloader(nodes=sampled_nodes, edge_index=sampled_edges, \
                                                     edge_attr=edge_attr[sample_time], y=y, pos=subpos).get_Temporalgraph()
             temporal_subgraphs.append(temporal_subgraph)
 
@@ -490,14 +483,18 @@ class Temporal_Splitting(object):
 def to_cuda(graph: Union[Data, Temporal_Dataloader], device:str = "cuda:0"):
     device = torch.device(device)
     if not isinstance(graph.x, torch.Tensor):
-        graph.x = torch.tensor(graph.x).to(device)
+        graph.x = torch.tensor(graph.x)
     if not isinstance(graph.edge_index, torch.Tensor):
-        graph.edge_index = torch.tensor(graph.edge_index).to(device)
-    if not isinstance(graph.edge_attr, torch.Tensor):
-        graph.edge_attr = torch.tensor(graph.edge_attr).to(device)
+        graph.edge_index = torch.tensor(graph.edge_index)
+    if graph.edge_attr != None and not isinstance(graph.edge_attr, torch.Tensor):
+        graph.edge_attr = torch.tensor(graph.edge_attr)
     if not isinstance(graph.y, torch.Tensor) or graph.y.device != device:
-        graph.y = torch.tensor(graph.y).to(device)
+        graph.y = torch.tensor(graph.y)
     
+    graph.x = graph.x.to(device)
+    graph.edge_index = graph.edge_index.to(device)
+    graph.y = graph.y.to(device)
+
     pos_x_switch=True
     try:
         graph.pos = graph.pos.to(device)

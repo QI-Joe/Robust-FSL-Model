@@ -255,7 +255,7 @@ def parse_yaml(path: str):
 
 
 def parse_json(path: str):
-    content = open(path).read()
+    content = open(rf"./GCA/{path}").read()
     return json.loads(content)
 
 def number_calculate(unique_num, freq):

@@ -2,6 +2,8 @@ import argparse
 import torch
 import random
 import torch
+import sys
+sys.path.append("/home/24052653g/Robust-FSL-Model/")
 from utils.my_dataloader import Temporal_Splitting, Dynamic_Dataloader, data_load, to_cuda, Temporal_Dataloader
 from utils.time_evaluation import TimeRecord
 from GCL.models import DualBranchContrast
@@ -44,9 +46,12 @@ def main_MVGRL(unknow_parms, time_: TimeRecord):
     snapshot = args.snapshots
 
     running_graph = 1
+    non_split=True
+
 
     graph, idxloader = data_load(args.dataset)
-    graph_list = Temporal_Splitting(graph, snapshot).temporal_splitting()
+    graph_list = Temporal_Splitting(graph).temporal_splitting(time_mode="view", \
+                    snapshot=snapshot, views=snapshot-2, strategy="sequential", non_split=non_split)
     dataneighbor = Dynamic_Dataloader(graph_list, graph=graph)
 
 

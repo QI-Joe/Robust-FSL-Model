@@ -1,5 +1,7 @@
 import random
 import torch
+import sys
+sys.path.append("/home/24052653g/Robust-FSL-Model/")
 from utils.my_dataloader import Temporal_Splitting, Dynamic_Dataloader, data_load, to_cuda
 from utils.time_evaluation import TimeRecord
 from GCA_node import Encoder, GRACE, GCA_config
@@ -11,8 +13,9 @@ from torch_geometric.loader import NeighborLoader
 from torch_geometric.data import Data
 import copy
 import argparse
+print(sys.path)
 
-def train_GCA(model: GRACE, optimizer, param, data, feature_weights, drop_weights, args):
+def train_GCA(model: GRACE, optimizer, param, data: Data, feature_weights, drop_weights, args):
     model.train()
     optimizer.zero_grad()
 
@@ -94,7 +97,7 @@ def main_GCA(outside_args, default_param, time_: TimeRecord):
     #                 snapshot=snapshot, views=snapshot-2, strategy="sequential", non_split=non_split)
     # temporaLoader = Dynamic_Dataloader(graph_list, graph=graph)
 
-    encoder = Encoder(graph.pos.size(1), param['num_hidden'], get_activation(param['activation']),
+    encoder = Encoder(graph.x.size(1), param['num_hidden'], get_activation(param['activation']),
                       base_model=get_base_model(param['base_model']), k=param['num_layers']).to(device)
     model = GRACE(encoder, param['num_hidden'], param['num_proj_hidden'], param['tau']).to(device)
     optimizer = torch.optim.Adam(
@@ -134,7 +137,7 @@ def main_GCA(outside_args, default_param, time_: TimeRecord):
             print(f'(T) | Epoch={epoch:03d}, loss={loss:.4f}, node Num={data.num_nodes}')
         
         time_.epoch_end(batch_size)
-        if (epoch+1) % 50 == 0:
+        if (epoch+1) % 200 == 0:
             all_data = data
             micro = eval_GCA(model=model, data=all_data, device=device, split=spliter, num_classes=num_classes)
 
