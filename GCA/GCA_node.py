@@ -10,10 +10,10 @@ from torch_geometric.nn import GCNConv
 def GCA_config(model_detail):
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=str, default='cuda:0')
-    parser.add_argument('--dataset', type=str, default='dblp')
+    parser.add_argument('--dataset', type=str, default='cora')
     parser.add_argument("--snapshots", type=int, default=10)
     parser.add_argument('--extra_abondan', type=int, default=0)
-    parser.add_argument("--num_epoches", type=int, default=200)
+    parser.add_argument("--num_epoches", type=int, default=2000)
     parser.add_argument('--param', type=str, default='local:coauthor_cs.json')
     parser.add_argument('--seed', type=int, default=2024)
     parser.add_argument('--verbose', type=str, default='train,eval,final')
